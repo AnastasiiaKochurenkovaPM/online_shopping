@@ -1,4 +1,4 @@
 # online_shopping
 
-Start backend(server) - npm start\n
-Start frontend(client) - npm start
+#Start backend(server) - npm start
+#Start frontend(client) - npm start
