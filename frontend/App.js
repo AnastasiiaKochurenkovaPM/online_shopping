@@ -6,50 +6,32 @@ import config from './config.js'
 
 export default function App() {
   useEffect(() => {
-    Notification.requestPermission()
-      .then((permission) => {
-        if (permission === "granted") {
-          console.log("Notification permission granted.");
-          if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-            navigator.serviceWorker
-              .register("/firebase-messaging-sw.js", { type: 'module' })  // Ensure this path is correct
-              .then((registration) => {
-                console.log("Service Worker registered:", registration);
-      
-                const app = initializeApp(config.firebase);
-                const messaging = getMessaging(app);
-      
-                
-                // Get the FCM token
-                getToken(messaging, {
-                  vapidKey: config.firebase.vapidKey,
-                  serviceWorkerRegistration: registration
-                }).then((currentToken) => {
-                  if (currentToken) {
-                    console.log("FCM Token:", currentToken);
-                  } else {
-                    console.warn("No registration token available.");
-                  }
-                }).catch((error) => {
-                  console.error("Error getting FCM token:", error);
-                });
-      
-                onMessage(messaging, (payload) => {
-                  console.log("Message received in foreground:", payload);
+    async function init() {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        console.log("Notification permissions not granted");
+        return;
+      }
+      console.log('permissions granted')
 
-                  alert(`New Message: ${payload.notification.title}`);
-                });
-      
-              })
-              .catch((error) => {
-                console.error("Service Worker registration failed:", error);
-              });
-          }
-        } else {
-          console.log("Notification permission denied.");
+      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { type: 'module' });
+          console.log('SW registered');
+          const app = initializeApp(config.firebase);
+          const messaging = getMessaging(app);
+          const token = await getToken(messaging, {
+            vapidKey: config.firebase.vapidKey,
+            serviceWorkerRegistration: registration
+          })
+          console.log({ token })
+
+        } catch (error) {
+          console.error('failed to register SW or retrieve token', error);
         }
-      })
-      .catch(error => console.error(error));    
+      }
+    }
+    init().then(console.log).catch(console.error)
   }, []);
 
   return (
