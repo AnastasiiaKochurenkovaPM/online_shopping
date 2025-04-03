@@ -18,3 +18,5 @@ logs/
 /uploads/
 /public/storage
 /storage/
+
+test.js
