@@ -5,7 +5,9 @@ import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import config from './config.js'
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
+
 import * as Device from 'expo-device';
+import { firebase } from '@react-native-firebase/messaging';
 // import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions'
 export default function App() {
   useEffect(() => {
@@ -36,30 +38,7 @@ export default function App() {
           }
         }
       } else if (os === 'android') {
-        // if (Device.isDevice) {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-
-        if (finalStatus !== 'granted') {
-          alert('Failed to get push token for push notification!');
-          return;
-        }
-        try {
-          token = (await Notifications.getDevicePushTokenAsync()).data;
-          console.log('Expo Push Token:', token);
-        } catch (error) {
-          console.error(error)
-        }
-
-
-       
-        console.log("ANDROID OKs")
-        alert('ANDROID');
+        registerForPushNotificationsAsync();
       } else {
         console.error('Unsupported platform');
       }
@@ -72,4 +51,40 @@ export default function App() {
       <StackNavigator />
     </>
   );
+}
+
+
+
+async function registerForPushNotificationsAsync() {
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    alert('Permission not granted!');
+    return;
+  }
+
+  console.log({ existingStatus, finalStatus })
+
+  try {
+    const token = await Notifications.getDevicePushTokenAsync();
+    console.log('token?', token)
+    console.log('Expo Push Token:', token.data);
+
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
+  } catch (error) {
+    console.error(error)
+  }
+
 }
