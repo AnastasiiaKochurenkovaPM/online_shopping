@@ -7,6 +7,7 @@ const register = async (req, res, next) => {
     try {
         const existingUser = await User.findOne({ email: req.body.email });
         if (existingUser) {
+            console.log("User with this email already exists");
             return next(createError(400, "User with this email already exists"));
         }
 
@@ -17,8 +18,10 @@ const register = async (req, res, next) => {
         });
 
         await newUser.save();
+        console.log("User has been created");
         res.status(201).json({ message: "User has been created", data: newUser });
     } catch (error) {
+        console.log("Server error");
         next(error)
         //return next(createError(500, "Server error"))
     }
@@ -28,10 +31,16 @@ const login = async (req, res, next) => {
     try {
         const user = await User.findOne({ email: req.body.email });
 
-        if (!user) return next(createError(404, "User not found!"));
+        if (!user) {
+            console.log("User not found!");
+            return next(createError(404, "User not found!"));
+        }
 
         const isCorrect = bcrypt.compareSync(req.body.password, user.password);
-        if (!isCorrect) return next(createError(400, "Wrong password!"));
+        if (!isCorrect) {
+            console.log("Wrong password!");
+            return next(createError(400, "Wrong password!"));
+        }
 
         const token = jwt.sign(
             { id: user._id, isAdmin: user.isAdmin },
@@ -44,7 +53,10 @@ const login = async (req, res, next) => {
             httpOnly: true,
         })
         .status(200)
-        .json(user)
+        //.json(user)
+        .json({ token, user: info }) 
+
+        console.log("Login successfuly");
     } catch (error) {
         next(error)
         //return next(createError(500, "Server error"))

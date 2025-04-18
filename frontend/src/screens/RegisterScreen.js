@@ -30,7 +30,7 @@ const RegisterScreen = () => {
 
     // send a POST  request to the backend API to register the user
     axios
-      .post("/api/auth/register", user)
+      .post("http://10.0.2.2:5000/api/auth/register", user)
       .then((response) => {
         console.log(response);
         Alert.alert(
@@ -40,6 +40,7 @@ const RegisterScreen = () => {
         setUserName("");
         setEmail("");
         setPassword("");
+        navigation.replace("Login");
       })
       .catch((error) => {
         Alert.alert(
@@ -53,14 +54,6 @@ const RegisterScreen = () => {
     <SafeAreaView
       style={{ flex: 1, backgroundColor: "white", alignItems: "center",marginTop:50  }}
     >
-      <View>
-        <Image
-          style={{ width: 150, height: 100 }}
-          source={{
-            uri: "https://assets.stickpng.com/thumbs/6160562276000b00045a7d97.png",
-          }}
-        />
-      </View>
 
       <KeyboardAvoidingView>
         <View style={{ alignItems: "center" }}>
@@ -100,7 +93,7 @@ const RegisterScreen = () => {
               style={{
                 color: "gray",
                 marginVertical: 10,
-                width: 300,
+                width: 250,
                 fontSize: username ? 16 : 16,
               }}
               placeholder="enter your name"

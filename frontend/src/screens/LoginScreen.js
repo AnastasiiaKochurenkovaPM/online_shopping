@@ -8,25 +8,28 @@ import {
     TextInput,
     Pressable,
   } from "react-native";
-  import React, { useState,useEffect } from "react";
-  import { MaterialIcons } from "@expo/vector-icons";
-  import { AntDesign } from "@expo/vector-icons";
-  import { useNavigation } from "@react-navigation/native";
-  import axios from "axios";
-  import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState,useEffect } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/userReducer";
 
+
+  
 const LoginScreen = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigation = useNavigation();
+    const dispatch = useDispatch();
+
     useEffect(() => {
         const checkLoginStatus = async () => {
             try {
                 const token = await AsyncStorage.getItem("authToken");
 
-                if (token) {
-                navigation.replace("Main");
-                }
             } catch (err) {
                 console.log("error message", err);
             }
@@ -40,17 +43,21 @@ const LoginScreen = () => {
         };
 
         axios
-        .post("/api/auth/login", user)
+        .post("http://10.0.2.2:5000/api/auth/login", user)
         .then((response) => {
-            console.log(response);
-            const token = response.data.token;
-            AsyncStorage.setItem("authToken", token);
-            navigation.replace("Home");
+          const token = response.data.token;
+          const userData = response.data.user;
+      
+          AsyncStorage.setItem("accessToken", token);
+          dispatch(setUser(userData));
+      
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home', params: { screen: 'Каталог' } }],
+          });
         })
-        .catch((error) => {
-            Alert.alert("Login Error", "Invalid Email");
-            console.log(error);
-        });
+      
+
     };
 
 
@@ -62,7 +69,7 @@ const LoginScreen = () => {
             <Image
               style={{ width: 150, height: 100 }}
               source={{
-                uri: "https://assets.stickpng.com/thumbs/6160562276000b00045a7d97.png",
+                uri: "https://www.google.com/imgres?q=shopy&imgurl=https%3A%2F%2Fcdn.theorg.com%2F2bd5fdd5-40de-4b46-8f0e-0e8c622ab528_medium.jpg&imgrefurl=https%3A%2F%2Ftheorg.com%2Forg%2Fshopy&docid=OnyFigiWBmWwBM&tbnid=ll_e7Rka-OOoSM&vet=12ahUKEwiG3OrQw9eMAxWVgP0HHVfbMDUQM3oECEkQAA..i&w=750&h=750&hcb=2&ved=2ahUKEwiG3OrQw9eMAxWVgP0HHVfbMDUQM3oECEkQAA",
               }}
             />
           </View>
@@ -143,7 +150,7 @@ const LoginScreen = () => {
                     width: 300,
                     fontSize: password ? 16 : 16,
                   }}
-                  placeholder="enter your Password"
+                  placeholder="enter your Password" 
                 />
               </View>
             </View>
@@ -156,10 +163,10 @@ const LoginScreen = () => {
                 justifyContent: "space-between",
               }}
             >
-              <Text>Keep me logged in</Text>
+              <Text></Text>
     
               <Text style={{ color: "#007FFF", fontWeight: "500" }}>
-                Forgot Password
+                
               </Text>
             </View>
     
