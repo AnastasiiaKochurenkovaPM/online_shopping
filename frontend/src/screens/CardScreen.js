@@ -14,7 +14,9 @@ const CardScreen = ({ route }) => {
       const fetchProduct = async () => {
         try {
           const response = await axios.get(`http://10.0.2.2:5000/api/products/${productId}`);
-          setProduct(response.data);
+          const rawProduct = response.data;
+          const formattedProduct = { ...rawProduct, id: rawProduct._id };
+          setProduct(formattedProduct);
         } catch (error) {
           console.log("Error fetching product:", error.message);
         }
@@ -87,5 +89,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
+    backgroundColor:  "#0f5813",
   },
 });

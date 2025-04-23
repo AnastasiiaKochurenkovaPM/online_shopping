@@ -1,18 +1,20 @@
 import React from "react";
 import { View, Text, Button, StyleSheet, FlatList } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart } from "../redux/cartSlice"; // Створіть екшн для видалення з кошика
+import { removeFromCart } from "../redux/cartSlice"; 
+import { useNavigation } from "@react-navigation/native";
 
-const CartScreen = ({ navigation }) => {
-  const cartItems = useSelector((state) => state.cart.items); // Отримуємо всі товари з кошика
+const CartScreen = () => {
+  const cartItems = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const handleRemoveFromCart = (productId) => {
-    dispatch(removeFromCart(productId)); // Видалення товару з кошика
+    dispatch(removeFromCart(productId)); 
   };
 
   const handleCheckout = () => {
-    navigation.navigate('Checkout'); // Направлення до сторінки оформлення замовлення
+    navigation.navigate('Checkout'); 
   };
 
   if (cartItems.length === 0) {

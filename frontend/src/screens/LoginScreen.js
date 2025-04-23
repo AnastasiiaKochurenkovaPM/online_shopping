@@ -14,8 +14,11 @@ import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { setUser } from "../redux/userReducer";
+import { Alert } from "react-native";
+
+
 
 
   
@@ -24,8 +27,17 @@ const LoginScreen = () => {
     const [password, setPassword] = useState("");
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const user = useSelector((state) => state.user.user);
 
     useEffect(() => {
+
+      if (user) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home', params: { screen: 'Профіль' } }],
+        });
+      }
+
         const checkLoginStatus = async () => {
             try {
                 const token = await AsyncStorage.getItem("authToken");
@@ -35,29 +47,36 @@ const LoginScreen = () => {
             }
             };
             checkLoginStatus();
-    }, []);
+    }, [user]);
+
     const handleLogin = () => {
         const user = {
         email: email,
         password: password,
         };
 
-        axios
-        .post("http://10.0.2.2:5000/api/auth/login", user)
-        .then((response) => {
-          const token = response.data.token;
-          const userData = response.data.user;
-      
-          AsyncStorage.setItem("accessToken", token);
-          dispatch(setUser(userData));
-      
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Home', params: { screen: 'Каталог' } }],
+          axios
+          .post("http://10.0.2.2:5000/api/auth/login", user)
+          .then((response) => {
+            const token = response.data.token;
+            const userData = response.data.user;
+        
+            AsyncStorage.setItem("accessToken", token);
+            dispatch(setUser(userData));
+        
+            // navigation.reset({
+            //   index: 0,
+            //   routes: [{ name: 'Home', params: { screen: 'Каталог' } }],
+            // });
+          })
+          .catch((error) => {
+            console.log("Login error:", error);
+            let errorMessage = "Something went wrong. Please try again.";
+            if (error.response && error.response.data && error.response.data.message) {
+              errorMessage = error.response.data.message;
+            }
+            Alert.alert("Login Error", errorMessage);
           });
-        })
-      
-
     };
 
 

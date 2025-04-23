@@ -12,6 +12,11 @@ import CardScreen from '../screens/CardScreen';
 import CartScreen from '../screens/CartScreen';
 import ProductsScreen from '../screens/ProductsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import CreateScreen from '../screens/CreateScreen';
+import AllProductsScreen from '../screens/AllProductsScreen';
+import EditProductScreen from '../screens/EditProductScreen';
+import CheckoutScreen from '../screens/CheckoutScreen';
+import OrdersScreen from '../screens/OrdersScreen';
 
 // Компоненти для вкладок
 function TabHomeScreen() {
@@ -22,12 +27,36 @@ function TabCatalogScreen() {
   return <ProductsScreen />;
 }
 
+function TabAllProductsScreen() {
+  return <AllProductsScreen />;
+}
+
 function TabCartScreen() {
   return <CartScreen />;
 }
 
 function TabProfileScreen() {
   return <ProfileScreen />;
+}
+
+function TabCreateScreen() {
+  return <CreateScreen />;
+}
+
+function TabCardScreen({ route }) {
+  return <CardScreen route={route} />;
+}
+
+function TabEditProductScreen({ route }) {
+  return <EditProductScreen route={route} />;
+}
+
+function TabCheckoutScreen({ route }) {
+  return <CheckoutScreen route={route} />;
+}
+
+function TabOrdersScreen({ route }) {
+  return <OrdersScreen route={route} />;
 }
 
 
@@ -89,7 +118,13 @@ const StackNavigator = () => {
           options={{ headerShown: false }} 
         />
         <Stack.Screen name="Cart" component={TabCartScreen} />
+        <Stack.Screen name="Card" component={TabCardScreen} />
         <Stack.Screen name="Products" component={TabCatalogScreen} /> 
+        <Stack.Screen name="CreateProduct" component={TabCreateScreen} />
+        <Stack.Screen name="AllProducts" component={TabAllProductsScreen} />
+        <Stack.Screen name="EditProduct" component={TabEditProductScreen} />
+        <Stack.Screen name="Checkout" component={TabCheckoutScreen} />
+        <Stack.Screen name="Orders" component={TabOrdersScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

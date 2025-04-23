@@ -30,15 +30,41 @@ const createProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, 
-            {
-                $set:req.body,
-            },
-            {
-                new: true,
+        // const updatedProduct = await Product.findByIdAndUpdate(req.params.id, 
+        //     {
+        //         $set:req.body,
+        //     },
+        //     {
+        //         new: true,
+        //     }
+        // )
+        // res.status(200).json({message:"Product gas been updated successfully", data: updatedProduct})
+
+        const updateFields = { ...req.body };
+
+        // Обробка categories
+        if (req.body.categories) {
+            // Якщо приходить рядок — розбиваємо його
+            if (typeof req.body.categories === "string") {
+                updateFields.categories = req.body.categories.split(",").map(cat => cat.trim());
             }
-        )
-        res.status(200).json({message:"Product gas been updated successfully", data: updatedProduct})
+        }
+
+        // Якщо нове зображення передано — додаємо до update
+        if (req.file) {
+            updateFields.image = req.file.path;
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id,
+            { $set: updateFields },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: "Product has been updated successfully",
+            data: updatedProduct
+        });
 
     } catch (error) {
         next(error)

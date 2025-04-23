@@ -51,7 +51,7 @@ const getUserOrder = async (req, res, next) => {
         res.status(200).json(order)
     } catch (error) {
         next(error)
-        //return next(createError(500, "Server error"))
+        return next(createError(500, "Server error"))
     }
 }
 
@@ -62,7 +62,7 @@ const getAllOrders = async (req, res, next) => {
         res.status(200).json(orders)
     } catch (error) {
         next(error)
-        //return next(createError(500, "Server error"))
+        return next(createError(500, "Server error"))
     }
 }
 
@@ -91,7 +91,7 @@ const getMonthlyIncome = async (req, res, next) => {
         res.status(200).json(monthlyIncome)
     } catch (error) {
         next(error)
-        //return next(createError(500, "Server error"))
+        return next(createError(500, "Server error"))
     }
 }
 

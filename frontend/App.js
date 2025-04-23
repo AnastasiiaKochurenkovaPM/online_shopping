@@ -7,6 +7,7 @@ import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/store.js';
+import AuthLoader from './src/components/AuthLoader.js';
 
 export default function App() {
 
@@ -25,22 +26,13 @@ export default function App() {
 
     init().catch(console.error);
 
- 
-    // Перевіряємо, чи є токен в AsyncStorage
-    const checkToken = async () => {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        // Відновлюємо сесію, якщо є токен
-        const user = JSON.parse(await AsyncStorage.getItem('user'));
-        dispatch(restoreUser(user)); // Відновлюємо дані користувача з Redux
-      }
-    }
-    checkToken();
   }, []);
 
   return (
     <Provider store={store}>
-      <StackNavigator />
+      <AuthLoader>
+        <StackNavigator />
+      </AuthLoader>
     </Provider>
   );
 }

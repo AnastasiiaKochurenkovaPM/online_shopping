@@ -6,19 +6,29 @@ import { clearUser, updateUser } from "../redux/userReducer";
 import axios from "axios";
 
 const ProfileScreen = () => {
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
   const user = useSelector((state) => state.user.user);
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+
   const [isEditing, setIsEditing] = useState(false);
-  
-  const [localUsername, setLocalUsername] = useState(user.username || "");
-  const [localEmail, setLocalEmail] = useState(user.email || "");
-  
+  const [localUsername, setLocalUsername] = useState("");
+  const [localEmail, setLocalEmail] = useState("");
+
+  // Якщо не залогінений — перенаправити
   useEffect(() => {
-    setLocalUsername(user.username || "");
-    setLocalEmail(user.email || "");
-  }, [user]); // коли Redux оновиться — локальні теж
-  
+    if (!user || !user._id) {
+      navigation.navigate("Login");
+    }
+  }, [user]);
+
+  // Синхронізація локального стану з user
+  useEffect(() => {
+    if (user && user._id) {
+      setLocalUsername(user.username || "");
+      setLocalEmail(user.email || "");
+    }
+  }, [user]);
+
   const handleSave = async () => {
     try {
       const updatedUser = { username: localUsername, email: localEmail };
@@ -26,10 +36,11 @@ const ProfileScreen = () => {
         `http://10.0.2.2:5000/api/users/update/${user._id}`,
         updatedUser
       );
-  
-      dispatch(updateUser(response.data)); // оновлюємо Redux
-  
+
+      dispatch(updateUser(response.data));
+
       Alert.alert("Успішно", "Ваш профіль оновлено.");
+      navigation.navigate("Profile")
       setIsEditing(false);
     } catch (err) {
       console.log(err);
@@ -42,24 +53,20 @@ const ProfileScreen = () => {
     navigation.navigate("Login");
   };
 
+  const handleViewOrders = () => {
+    navigation.navigate("Orders"); 
+  };
+
+
   if (!user || !user._id) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Користувач не увійшов у систему</Text>
-        <Pressable
-          style={styles.button}
-          onPress={() => navigation.navigate("Login")}
-        >
-          <Text style={styles.buttonText}>Увійти</Text>
-        </Pressable>
-      </View>
-    );
+    return null;
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Профіль користувача</Text>
       <Text style={styles.text}>ID: {user._id}</Text>
+      
 
       {isEditing ? (
         <>
@@ -94,16 +101,44 @@ const ProfileScreen = () => {
       )}
 
       <Pressable
+          style={[styles.button, { backgroundColor: "#1565c0" }]}
+          onPress={handleViewOrders}
+        >
+          <Text style={styles.buttonText}>Мої замовлення</Text>
+      </Pressable>
+
+      <Pressable
         style={[styles.button, { backgroundColor: "#c62828" }]}
         onPress={handleLogout}
       >
         <Text style={styles.buttonText}>Вийти</Text>
       </Pressable>
+    
+
+      {user.isAdmin && (
+        <>
+          <Pressable
+            style={[styles.button, { backgroundColor: "#1565c0" }]}
+            onPress={() => navigation.navigate("CreateProduct")}
+          >
+            <Text style={styles.buttonText}>➕ Додати товар</Text>
+          </Pressable>
+
+          <Pressable
+            style={[styles.button, { backgroundColor: "#2e7d32" }]}
+            onPress={() => navigation.navigate("AllProducts")}
+          >
+            <Text style={styles.buttonText}>📋 Переглянути всі товари</Text>
+          </Pressable>
+
+        </>
+      )}
     </View>
   );
 };
 
 export default ProfileScreen;
+
 
 const styles = StyleSheet.create({
   container: {

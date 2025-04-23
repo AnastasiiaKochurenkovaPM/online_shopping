@@ -23,7 +23,7 @@ const register = async (req, res, next) => {
     } catch (error) {
         console.log("Server error");
         next(error)
-        //return next(createError(500, "Server error"))
+        return next(createError(500, "Server error"))
     }
 };
 
@@ -59,7 +59,10 @@ const login = async (req, res, next) => {
         console.log("Login successfuly");
     } catch (error) {
         next(error)
-        //return next(createError(500, "Server error"))
+        res.status(500).json({
+            message: "Login field!",
+            error: error
+        });
     }
 };
 
@@ -75,7 +78,7 @@ const logout = async (req, res)=>{
     .send("User has been logged out.")
     } catch (error) {
         next(error)
-        //return next(createError(500, "Server error"))
+        return next(createError(500, "Server error"))
     }
     
 };
